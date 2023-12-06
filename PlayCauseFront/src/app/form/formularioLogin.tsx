@@ -11,6 +11,7 @@ import {
   Button,
   FormHelperText,
   Alert,
+  useToast,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FunctionComponent } from "react";
@@ -18,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useNavigate, Outlet, Link } from "react-router-dom";
 import axios from "axios";
+import { LoginFormSchema } from "./loginSchema";
 
 interface Login {
   email: string;
@@ -35,8 +37,13 @@ type LoginSchemaType = z.infer<typeof LoginSchema>;
 
 const App: FunctionComponent<Login> = () => {
   const navigate = useNavigate();
+const toast = useToast();
 
-  const {register,handleSubmit,formState: { errors },} = useForm<LoginSchemaType>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
   });
 
@@ -50,9 +57,12 @@ const App: FunctionComponent<Login> = () => {
         navigate(`/chat/${jsonData.nome}`);
       })
       .catch((error) => {
-        navigate(`/`)
-        alert("login ou senha Errados")
-        console.error("Erro na requisição:", error);
+          toast({
+            title: "Erro no Login Usuario ou Senha Incorreto ",
+            status: "error",
+            duration: 5000, // A duração em milissegundos
+            isClosable: true,
+          });
       });
   };
 
@@ -100,10 +110,9 @@ const App: FunctionComponent<Login> = () => {
                 <Link to="/cadastro"> Clique aqui</Link>
                 <Outlet />
               </FormHelperText>
-            </FormControl>            
+            </FormControl>
           </Flex>
         </form>
-        
       </Box>
     </ChakraProvider>
   );
